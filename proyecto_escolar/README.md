@@ -1,284 +1,877 @@
 # Sistema Web Escolar - Gestión Académica
 
-## Descripción
+## Descripción General
 
-Sistema web integral para la gestión académica de instituciones educativas. Permite administrar:
+Sistema web desarrollado con Flask para la administración académica de una institución educativa. El proyecto permite gestionar alumnos, grupos, materias, docentes, planeaciones y calificaciones desde una interfaz web estructurada y modular.
 
-- **Alumnos**: Registro, edición y gestión de estudiantes
-- **Grupos**: Creación y administración de grupos por semestre y turno
-- **Materias**: Catálogo de materias con créditos y horas
-- **Docentes**: Registro de maestros y sus especialidades
-- **Calificaciones**: Sistema de evaluación con tipos (parcial, final, tarea, participación)
-- **Reportes**: Reportes por alumno y por grupo
-- **Autenticación**: Sistema de login seguro con roles
+El sistema implementa:
 
-## Tecnologías
+* Autenticación de usuarios.
+* Gestión académica completa.
+* Panel administrativo con estadísticas.
+* CRUDs para entidades principales.
+* Relación entre alumnos, docentes, materias y grupos.
+* Registro de calificaciones.
+* Organización modular mediante Blueprints.
+* ORM con SQLAlchemy.
+* Plantillas HTML usando Jinja2.
+* Configuración mediante variables de entorno.
 
-- **Backend**: Flask 3.0.0
-- **ORM**: SQLAlchemy 2.0.23
-- **Base de Datos**: MySQL 8.0+
-- **Frontend**: HTML5, CSS3, Bootstrap 5.3.0
-- **Autenticación**: Werkzeug (Hash de contraseñas)
+---
 
-## Requisitos
+# Tecnologías Utilizadas
 
-- Python 3.8+
-- MySQL 8.0+
-- pip (gestor de paquetes de Python)
+## Backend
 
-## Instalación
+* Python 3.8+
+* Flask 3.x
+* Flask-SQLAlchemy
+* SQLAlchemy 2.x
+* Werkzeug
+* PyMySQL
+* python-dotenv
 
-### 1. Clonar el repositorio
+## Frontend
 
-```bash
-git clone https://github.com/EfrenAlexander-Robles/gestion_web_escolar.git
-cd gestion_web_escolar/proyecto_escolar
+* HTML5
+* CSS3
+* Bootstrap 5
+* JavaScript
+
+## Base de Datos
+
+* MySQL 8+
+* SQLite (instancia local incluida para pruebas)
+
+---
+
+# Arquitectura del Proyecto
+
+```text
+proyecto_escolar/
+│
+├── app/
+│   ├── models/
+│   ├── routes/
+│   ├── templates/
+│   ├── static/
+│   └── __init__.py
+│
+├── database/
+├── diagramas/
+├── instance/
+├── sql/
+├── config.py
+├── run.py
+├── requirements.txt
+├── README.md
+└── .env.example
 ```
 
-### 2. Crear entorno virtual
+---
+
+# Estructura Completa del Proyecto
+
+## Carpeta `app/`
+
+Contiene toda la lógica principal de la aplicación.
+
+### `app/models/`
+
+Define las entidades y tablas de la base de datos mediante SQLAlchemy.
+
+Archivos:
+
+* `usuario.py`
+* `turno.py`
+* `grupo.py`
+* `materia.py`
+* `docente.py`
+* `alumno.py`
+* `planeacion.py`
+* `calificacion.py`
+
+### `app/routes/`
+
+Contiene las rutas HTTP organizadas mediante Blueprints.
+
+Archivos:
+
+* `auth.py`
+* `dashboard.py`
+* `alumnos.py`
+* `grupos.py`
+* `materias.py`
+* `docentes.py`
+* `planeacion.py`
+* `calificaciones.py`
+
+### `app/templates/`
+
+Plantillas HTML renderizadas por Flask.
+
+Subdirectorios:
+
+* `auth/`
+* `dashboard/`
+* `alumnos/`
+* `grupos/`
+* `materias/`
+* `docentes/`
+* `planeacion/`
+* `calificaciones/`
+
+### `app/static/`
+
+Archivos estáticos.
+
+Contiene:
+
+* CSS
+* JavaScript
+* estilos globales
+* scripts de interacción
+
+---
+
+# Archivo `run.py`
+
+Punto de entrada principal del sistema.
+
+## Funcionalidad
+
+* Inicializa la aplicación Flask.
+* Obtiene variables de entorno.
+* Configura host, puerto y modo debug.
+* Ejecuta el servidor web.
+
+## Código Principal
+
+```python
+from app import create_app
+import os
+
+if __name__ == '__main__':
+    app = create_app()
+
+    port = int(os.environ.get('PORT', 5000))
+    host = os.environ.get('HOST', '127.0.0.1')
+    debug = os.environ.get('FLASK_DEBUG', True)
+
+    app.run(host=host, port=port, debug=debug)
+```
+
+## Variables Utilizadas
+
+| Variable    | Descripción                 |
+| ----------- | --------------------------- |
+| PORT        | Puerto del servidor         |
+| HOST        | Dirección IP del servidor   |
+| FLASK_DEBUG | Activa/desactiva modo debug |
+
+---
+
+# Archivo `config.py`
+
+Contiene la configuración global del sistema.
+
+## Funcionalidades
+
+* Carga variables de entorno.
+* Configura la base de datos.
+* Configura cookies de sesión.
+* Define SECRET_KEY.
+
+## Clase Principal
+
+```python
+class Configuracion:
+```
+
+## Variables Configuradas
+
+| Variable                       | Descripción                        |
+| ------------------------------ | ---------------------------------- |
+| SECRET_KEY                     | Clave de seguridad de Flask        |
+| SQLALCHEMY_DATABASE_URI        | URL de conexión a la base de datos |
+| SQLALCHEMY_TRACK_MODIFICATIONS | Desactiva seguimiento innecesario  |
+| SESSION_COOKIE_HTTPONLY        | Protege cookies                    |
+| SESSION_COOKIE_SAMESITE        | Política SameSite                  |
+
+---
+
+# Archivo `app/__init__.py`
+
+Inicializa la aplicación Flask.
+
+## Responsabilidades
+
+* Crear instancia Flask.
+* Inicializar SQLAlchemy.
+* Cargar configuración.
+* Registrar Blueprints.
+* Importar modelos.
+* Crear tablas automáticamente.
+
+## Blueprints Registrados
+
+| Blueprint      | Función                  |
+| -------------- | ------------------------ |
+| auth           | Autenticación            |
+| dashboard      | Panel principal          |
+| alumnos        | CRUD alumnos             |
+| grupos         | CRUD grupos              |
+| materias       | CRUD materias            |
+| docentes       | CRUD docentes            |
+| planeacion     | Planeaciones académicas  |
+| calificaciones | Registro de evaluaciones |
+
+---
+
+# Modelos de Base de Datos
+
+## Modelo `Usuario`
+
+Archivo:
+
+```text
+app/models/usuario.py
+```
+
+## Campos
+
+| Campo          | Tipo     | Descripción            |
+| -------------- | -------- | ---------------------- |
+| id             | Integer  | ID principal           |
+| nombre         | String   | Nombre del usuario     |
+| apellido       | String   | Apellido               |
+| email          | String   | Correo único           |
+| password       | String   | Contraseña hasheada    |
+| rol            | String   | Rol del usuario        |
+| activo         | Boolean  | Estado activo/inactivo |
+| ultimo_login   | DateTime | Último acceso          |
+| creado_en      | DateTime | Fecha creación         |
+| actualizado_en | DateTime | Fecha actualización    |
+
+## Métodos
+
+### `set_password(password)`
+
+Genera hash seguro de contraseña.
+
+### `check_password(password)`
+
+Verifica contraseñas.
+
+### `to_dict()`
+
+Serializa el objeto.
+
+---
+
+## Modelo `Alumno`
+
+Archivo:
+
+```text
+app/models/alumno.py
+```
+
+## Campos
+
+| Campo          | Tipo       |
+| -------------- | ---------- |
+| id             | Integer    |
+| matricula      | String     |
+| nombre         | String     |
+| apellido       | String     |
+| grupo_id       | ForeignKey |
+| activo         | Boolean    |
+| creado_en      | DateTime   |
+| actualizado_en | DateTime   |
+
+## Relaciones
+
+* Relación con `Grupo`.
+* Relación con `Calificacion`.
+
+## Métodos
+
+### `nombre_completo()`
+
+Retorna nombre y apellido concatenados.
+
+### `promedio()`
+
+Calcula promedio automático del alumno.
+
+### `to_dict()`
+
+Convierte datos a diccionario serializable.
+
+---
+
+## Modelo `Calificacion`
+
+Archivo:
+
+```text
+app/models/calificacion.py
+```
+
+## Campos
+
+| Campo          | Tipo       |
+| -------------- | ---------- |
+| id             | Integer    |
+| alumno_id      | ForeignKey |
+| planeacion_id  | ForeignKey |
+| docente_id     | ForeignKey |
+| valor          | Float      |
+| tipo           | String     |
+| fecha          | Date       |
+| comentarios    | Text       |
+| creado_en      | DateTime   |
+| actualizado_en | DateTime   |
+
+## Tipos de Calificación
+
+* Parcial
+* Final
+* Tarea
+* Participación
+
+## Métodos
+
+### `estado()`
+
+Determina si el alumno aprobó o reprobó.
+
+### `to_dict()`
+
+Serializa datos.
+
+---
+
+## Modelo `Grupo`
+
+Responsable de agrupar alumnos por:
+
+* Semestre
+* Turno
+* Grupo
+
+Relaciones:
+
+* Uno a muchos con alumnos.
+* Relación con planeaciones.
+
+---
+
+## Modelo `Materia`
+
+Gestiona:
+
+* Nombre de materia.
+* Créditos.
+* Horas.
+* Planeaciones.
+
+---
+
+## Modelo `Docente`
+
+Gestiona:
+
+* Información del maestro.
+* Especialidad.
+* Relaciones con planeaciones.
+* Relación con calificaciones.
+
+---
+
+## Modelo `Planeacion`
+
+Relaciona:
+
+* Materias.
+* Docentes.
+* Grupos.
+
+Permite estructurar actividades académicas.
+
+---
+
+## Modelo `Turno`
+
+Representa:
+
+* Matutino.
+* Vespertino.
+* Nocturno.
+
+---
+
+# Sistema de Autenticación
+
+Archivo:
+
+```text
+app/routes/auth.py
+```
+
+## Funcionalidades
+
+* Login.
+* Logout.
+* Registro de usuarios.
+* Manejo de sesiones.
+* Validación de credenciales.
+* Hash de contraseñas.
+
+## Rutas
+
+| Ruta           | Método   | Función           |
+| -------------- | -------- | ----------------- |
+| /auth/login    | GET/POST | Inicio de sesión  |
+| /auth/logout   | GET      | Cerrar sesión     |
+| /auth/register | GET/POST | Registro usuarios |
+
+## Variables de Sesión
+
+| Variable       | Descripción    |
+| -------------- | -------------- |
+| usuario_id     | ID del usuario |
+| usuario_email  | Correo         |
+| usuario_rol    | Rol            |
+| usuario_nombre | Nombre         |
+
+---
+
+# Dashboard
+
+Archivo:
+
+```text
+app/routes/dashboard.py
+```
+
+## Funcionalidades
+
+* Estadísticas generales.
+* Conteo de entidades.
+* Promedio general.
+* Detección de bajo rendimiento.
+* Protección de rutas.
+
+## Decoradores
+
+### `login_required`
+
+Restringe acceso a usuarios autenticados.
+
+### `admin_required`
+
+Restringe acceso a administradores.
+
+## Estadísticas Generadas
+
+* Total alumnos.
+* Total grupos.
+* Total materias.
+* Total calificaciones.
+* Promedio general.
+* Alumnos con promedio menor a 7.
+
+---
+
+# CRUDs Implementados
+
+## Gestión de Alumnos
+
+Funciones:
+
+* Crear alumnos.
+* Editar alumnos.
+* Eliminar alumnos.
+* Ver detalles.
+* Listar alumnos.
+* Calcular promedio.
+
+## Gestión de Grupos
+
+Funciones:
+
+* Crear grupos.
+* Modificar grupos.
+* Eliminar grupos.
+* Ver alumnos asignados.
+
+## Gestión de Materias
+
+Funciones:
+
+* Registrar materias.
+* Actualizar información.
+* Eliminar materias.
+* Asociar planeaciones.
+
+## Gestión de Docentes
+
+Funciones:
+
+* Registro de docentes.
+* Especialidades.
+* Asignaciones.
+
+## Gestión de Calificaciones
+
+Funciones:
+
+* Registrar calificaciones.
+* Actualizar evaluaciones.
+* Historial académico.
+* Estados aprobado/reprobado.
+
+---
+
+# Sistema de Plantillas
+
+El proyecto utiliza Jinja2.
+
+## Archivo Base
+
+```text
+app/templates/base.html
+```
+
+Sirve como plantilla principal.
+
+## Beneficios
+
+* Reutilización de componentes.
+* Menús compartidos.
+* Estructura uniforme.
+* Reducción de código duplicado.
+
+---
+
+# Base de Datos
+
+## Scripts SQL
+
+Ubicación:
+
+```text
+/database/schema.sql
+/sql/schema.sql
+```
+
+## Contenido
+
+* Creación de tablas.
+* Relaciones.
+* Llaves foráneas.
+* Restricciones.
+* Datos iniciales.
+
+---
+
+# Diagramas
+
+La carpeta `diagramas/` contiene:
+
+| Archivo          | Descripción              |
+| ---------------- | ------------------------ |
+| arquitectura.png | Arquitectura del sistema |
+| casos_uso.png    | Casos de uso             |
+| modelo_er.png    | Modelo entidad-relación  |
+
+---
+
+# Instalación Completa
+
+## 1. Clonar proyecto
 
 ```bash
-# Windows
+git clone <repositorio>
+cd proyecto_escolar
+```
+
+---
+
+## 2. Crear entorno virtual
+
+### Windows
+
+```bash
 python -m venv .venv
 .venv\Scripts\activate
+```
 
-# macOS/Linux
+### Linux/macOS
+
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### 3. Instalar dependencias
+---
+
+## 3. Instalar dependencias
 
 ```bash
-pip install -r requeriments.txt
+pip install -r requirements.txt
 ```
 
-### 4. Configurar base de datos
+---
 
-#### Opción A: Base de datos local
+# Dependencias Principales
 
-```bash
-# En Windows (PowerShell)
-$env:DATABASE_URL="mysql+pymysql://usuario:password@localhost:3306/control_escolar"
+| Dependencia      | Uso                 |
+| ---------------- | ------------------- |
+| Flask            | Framework web       |
+| Flask-SQLAlchemy | Integración ORM     |
+| SQLAlchemy       | Manejo BD           |
+| PyMySQL          | Driver MySQL        |
+| Werkzeug         | Seguridad y hashing |
+| python-dotenv    | Variables entorno   |
 
-# En Linux/macOS
-export DATABASE_URL="mysql+pymysql://usuario:password@localhost:3306/control_escolar"
-```
+---
 
-#### Opción B: Usar archivo .env
+# Configuración del Entorno
 
-Copia `.env.example` a `.env` y actualiza los valores:
+## Archivo `.env`
 
-```bash
-cp .env.example .env
-```
+Ejemplo:
 
-Edita `.env`:
-
-```
+```env
 DATABASE_URL=mysql+pymysql://usuario:password@localhost:3306/control_escolar
+SECRET_KEY=clave_super_secreta
 FLASK_ENV=development
 FLASK_DEBUG=True
-SECRET_KEY=tu-clave-secreta
+HOST=127.0.0.1
+PORT=5000
 ```
 
-### 5. Crear base de datos
+---
+
+# Crear Base de Datos
+
+## MySQL
 
 ```bash
 mysql -u root -p < database/schema.sql
 ```
 
-### 6. Ejecutar la aplicación
+---
+
+# Ejecutar Aplicación
 
 ```bash
 python run.py
 ```
 
-La aplicación estará disponible en: **http://127.0.0.1:5000**
+Servidor disponible en:
 
-## Uso
-
-### Acceso Inicial
-
-**Email:** `admin@school.local`  
-**Contraseña:** Debe ser actualizada en la base de datos
-
-Para cambiar la contraseña del admin, ejecuta en MySQL:
-
-```sql
-UPDATE usuarios SET password = 'tu-nueva-contraseña' WHERE email = 'admin@school.local';
+```text
+http://127.0.0.1:5000
 ```
-
-### Roles
-
-- **Admin**: Acceso completo al sistema
-- **Docente**: Gestionar calificaciones y ver reportes
-- **Control Escolar**: Gestionar alumnos, grupos y materias
-
-## Estructura del Proyecto
-
-```
-proyecto_escolar/
-├── app/
-│   ├── models/              # Modelos de datos
-│   │   ├── usuario.py
-│   │   ├__ alumno.py
-│   │   ├── grupo.py
-│   │   ├── materia.py
-│   │   ├── docente.py
-│   │   ├── planeacion.py
-│   │   ├── calificacion.py
-│   │   ├── turno.py
-│   │   ├└─ __init__.py
-│   ├── routes/              # Rutas y vistas
-│   │   ├── auth.py
-│   │   ├── dashboard.py
-│   │   ├── alumnos.py
-│   │   ├── grupos.py
-│   │   ├── materias.py
-│   │   ├── docentes.py
-│   │   ├── calificaciones.py
-│   │   ├└─ test.py
-│   ├── templates/           # Plantillas HTML
-│   │   ├── base.html
-│   │   ├── auth/
-│   │   ├── dashboard/
-│   │   ├── alumnos/
-│   │   ├── grupos/
-│   │   ├── materias/
-│   │   ├── docentes/
-│   │   ├└─ calificaciones/
-│   └─ __init__.py
-├── database/
-│   └─ schema.sql             # Script de base de datos
-├── .env.example
-├── .gitignore
-├── config.py
-├── create_key.py
-├── requeriments.txt
-├── run.py
-├└─ README.md
-```
-
-## Características Principales
-
-### 📚 Dashboard
-- Estadísticas generales del sistema
-- Promedio general de calificaciones
-- Estudiantes con bajo rendimiento
-- Accesos rápidos a funciones principales
-
-### 👤 Gestión de Alumnos
-- CRUD completo
-- Filtrado por grupo
-- Visualización de calificaciones
-- Cálculo automático de promedios
-
-### 👥 Gestión de Grupos
-- Creación por semestre y turno
-- Vista de alumnos por grupo
-- Estadísticas de desempeño
-
-### 📚 Gestión de Materias
-- Catálogo de materias
-- Créditos y horas semanales
-- Descripciones detalladas
-
-### 🐺 Gestión de Docentes
-- Registro de maestros
-- Especialidades
-- Contacto directo
-
-### ⭐ Sistema de Calificaciones
-- Tipos: Parcial, Final, Tarea, Participación
-- Escala 0-10
-- Cálculo automático de promedios
-- Estados (Aprobado/Reprobado)
-
-### 📈 Reportes
-- Reporte por alumno
-- Reporte por grupo
-- Imprimibles en PDF
-
-## API REST
-
-El sistema incluye endpoints JSON para integraciones:
-
-```
-GET  /alumnos/api/listar
-GET  /grupos/api/listar
-GET  /materias/api/listar
-GET  /docentes/api/listar
-GET  /calificaciones/api/listar
-```
-
-## Seguridad
-
-- Contraseñas hasheadas con Werkzeug
-- Sesión con cookies seguras
-- Validaciones server-side
-- Protección contra CSRF (a implementar)
-- Control de acceso por rol
-
-## Problemas Comunes
-
-### Error: "ModuleNotFoundError: No module named 'flask'"
-
-```bash
-pip install -r requeriments.txt
-```
-
-### Error: "Error de conexión a base de datos"
-
-Verifica:
-1. MySQL está ejecutándose
-2. Credenciales correctas en DATABASE_URL
-3. Base de datos existe
-
-### Error: "Table doesn't exist"
-
-Ejecuta el schema SQL:
-
-```bash
-mysql -u root -p control_escolar < database/schema.sql
-```
-
-## Roadmap Futuro
-
-- [ ] Exportar reportes a PDF
-- [ ] Autenticación con LDAP
-- [ ] Médulo de asistencia
-- [ ] Notificaciones por email
-- [ ] Sistema de tareas
-- [ ] Calificaciones con rúbrica
-- [ ] API GraphQL
-- [ ] Aplicación móvil
-
-## Contribuir
-
-Las contribuciones son bienvenidas. Por favor:
-
-1. Fork el repositorio
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
-
-## Licencia
-
-Este proyecto está licenciado bajo la Licencia MIT - ver el archivo LICENSE para detalles.
-
-## Autor
-
-**Efrén Alexander Robles Gómez**  
-Estudiante de 4to I  
-Centro de Bachillerato Tecnológico Industrial y de Servicios No. 246  
-
-## Contacto
-
-- GitHub: [@EfrenAlexander-Robles](https://github.com/EfrenAlexander-Robles)
-- Email: efren.robles@cbtis246.edu.mx
 
 ---
 
-**Última actualización:** 27 de Mayo de 2026
+# Seguridad Implementada
+
+## Contraseñas
+
+* Hash mediante Werkzeug.
+* Verificación segura.
+* Contraseñas no almacenadas en texto plano.
+
+## Sesiones
+
+* Cookies HttpOnly.
+* SameSite configurado.
+* Variables protegidas.
+
+## Acceso
+
+* Protección mediante decoradores.
+* Validación de usuarios activos.
+* Restricción por roles.
+
+---
+
+# Roles del Sistema
+
+## Administrador
+
+Permisos:
+
+* Acceso completo.
+* Registro de usuarios.
+* Administración total.
+
+## Docente
+
+Permisos:
+
+* Gestión académica.
+* Registro de calificaciones.
+* Consulta de grupos.
+
+## Control Escolar
+
+Permisos:
+
+* Gestión de alumnos.
+* Administración de grupos.
+* Control académico.
+
+---
+
+# Relaciones Principales
+
+## Alumno
+
+* Pertenece a un grupo.
+* Tiene muchas calificaciones.
+
+## Grupo
+
+* Tiene muchos alumnos.
+* Tiene planeaciones.
+
+## Planeación
+
+Relaciona:
+
+* Grupo.
+* Materia.
+* Docente.
+
+## Calificación
+
+Pertenece a:
+
+* Alumno.
+* Planeación.
+* Docente.
+
+---
+
+# Funciones Importantes
+
+## Promedio Automático
+
+Implementado en:
+
+```python
+Alumno.promedio()
+```
+
+Calcula promedio dinámicamente.
+
+---
+
+## Estado de Calificación
+
+Implementado en:
+
+```python
+Calificacion.estado()
+```
+
+Retorna:
+
+* Aprobado.
+* Reprobado.
+
+---
+
+# Ventajas del Proyecto
+
+* Arquitectura modular.
+* Separación clara de responsabilidades.
+* Escalable.
+* Fácil mantenimiento.
+* ORM robusto.
+* Integración sencilla con MySQL.
+* Seguridad básica implementada.
+* CRUDs completos.
+* Uso de Blueprints.
+
+---
+
+# Posibles Mejoras Futuras
+
+* API REST.
+* JWT.
+* Roles avanzados.
+* Exportación PDF/Excel.
+* Reportes gráficos.
+* Notificaciones.
+* Recuperación de contraseña.
+* Auditoría de cambios.
+* Logs del sistema.
+* Dockerización.
+* Tests automatizados.
+* CI/CD.
+
+---
+
+# Recomendaciones Técnicas
+
+## Producción
+
+No usar:
+
+```python
+debug=True
+```
+
+en producción.
+
+## Seguridad
+
+Cambiar:
+
+* SECRET_KEY.
+* Credenciales de base de datos.
+* Usuario administrador inicial.
+
+## Base de Datos
+
+* Implementar migraciones.
+* Respaldos automáticos.
+* Índices optimizados.
+
+---
+
+# Flujo General del Sistema
+
+```text
+Usuario → Login → Dashboard → CRUDs → Base de Datos
+```
+
+---
+
+# Estado del Proyecto
+
+El sistema ya cuenta con:
+
+* Arquitectura funcional.
+* Persistencia de datos.
+* Gestión académica.
+* Sistema de autenticación.
+* CRUDs operativos.
+* Dashboard funcional.
+* Plantillas HTML.
+* ORM configurado.
+* Conexión MySQL.
+
+---
+
+# Autor
+
+Proyecto desarrollado para gestión escolar académica usando Flask y SQLAlchemy.
